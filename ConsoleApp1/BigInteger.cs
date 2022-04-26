@@ -1,4 +1,6 @@
-﻿namespace ConsoleApp1;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ConsoleApp1;
 
 public class BigInteger
 {
@@ -26,9 +28,10 @@ public class BigInteger
     public static BigInteger operator +(BigInteger a, BigInteger b) => a.Add(b);
     public static BigInteger operator -(BigInteger a, BigInteger b) => a.Sub(b);
     
-    public bool IsNegative()
+    public bool IsNegative
     {
-        return isNegative;
+        get { return isNegative; }
+        set { isNegative = value; }
     }
 
     public int Length()
@@ -53,14 +56,14 @@ public class BigInteger
         return strNumber;
     }
 
-    public BigInteger Add(BigInteger another)
+    private BigInteger Sum(int[] a, int[] b)
     {
-        var smaller = _numbers.Length < another.numbers.Length ? _numbers : another.numbers;
-        var bigger = _numbers.Length > another.numbers.Length ? _numbers : another.numbers;
+        var smaller = a.Length < b.Length ? a : b;
+        var bigger = a.Length > b.Length ? a : b;
         var resultNumbers = new int[bigger.Length + 1];
         var remainder = 0;
         var strNumber = "";
-
+        
         for (var i = 0; i < smaller.Length; i++)
         {
             var result = new int();
@@ -89,29 +92,29 @@ public class BigInteger
 
         if (remainder != 0)
         {
-           for (var i = smaller.Length; i < bigger.Length; i++)
-           {
-               var result = bigger[i] + remainder;
-               if (result >= 10)
-               {
-                   resultNumbers[i] = result - 10;
-                   remainder = 1;
-               }
+            for (var i = smaller.Length; i < bigger.Length; i++)
+            {
+                var result = bigger[i] + remainder;
+                if (result >= 10)
+                {
+                    resultNumbers[i] = result - 10;
+                    remainder = 1;
+                }
 
-               else
-               {
-                   resultNumbers[i] = result;
-                   remainder = 0;
-               }
-           } 
+                else
+                {
+                    resultNumbers[i] = result;
+                    remainder = 0;
+                }
+            }
         }
 
         else
         {
-            for (var i = smaller.Length; i < bigger.Length; i++) 
-            { 
+            for (var i = smaller.Length; i < bigger.Length; i++)
+            {
                 resultNumbers[i] = bigger[i];
-            }   
+            }
         }
 
         if (resultNumbers[^1] == 0)
@@ -123,7 +126,7 @@ public class BigInteger
                 finalNumbers[i] = resultNumbers[i];
             }
 
-            for (var i = finalNumbers.Length - 1; i >=0; i--)
+            for (var i = finalNumbers.Length - 1; i >= 0; i--)
             {
                 strNumber += Convert.ToString(finalNumbers[i]);
             }
@@ -133,38 +136,57 @@ public class BigInteger
         {
             var finalNumbers = resultNumbers;
 
-            for (var i = finalNumbers.Length - 1; i >=0; i--)
+            for (var i = finalNumbers.Length - 1; i >= 0; i--)
             {
                 strNumber += Convert.ToChar(finalNumbers[i]);
             }
         }
 
         var resultBigInteger = new BigInteger(strNumber);
-        
+
         return resultBigInteger;
     }
 
-    public BigInteger Sub(BigInteger another)
+    private BigInteger Difference(int[] a, int[] b)
     {
-        var smaller = _numbers.Length < another.numbers.Length ? _numbers : another.numbers;
-        var bigger = _numbers.Length > another.numbers.Length ? _numbers : another.numbers;
-        var isBigger = bigger == _numbers ? true : false;
+        var smaller = a.Length < b.Length ? a : b;
+        var bigger = a.Length > b.Length ? a : b;
+        var isEqual = a.Length == b.Length ? true : false;
+        var isLonger = bigger == a ? true : false;
+        var isBigger = true;
         var resultNumbers = new int[bigger.Length + 1];
         var remainder = 0;
         var strNumber = "";
+        
+        if (isEqual == true)
+        {
+            var i = a.Length - 1;
+            while (isBigger == true && i >= 0)
+            {
+                isBigger = a[i] >= b[i] ? true : false;
+                i--;
+            }
 
+            if (isBigger == false)
+            {
+                var result = Difference(b, a);
+                result.isNegative = true;
+                return result;
+            }
+        }
+        
         for (var i = 0; i < smaller.Length; i++)
         {
             var result = new int();
             
             if (remainder == 0)
             {
-                result = _numbers[i] - another.numbers[i];
+                result = a[i] - b[i];
             }
 
             else
             {
-                result = _numbers[i] - another.numbers[i] - 1;
+                result = a[i] - b[i] - 1;
             }
 
             if (result < 0)
@@ -184,7 +206,7 @@ public class BigInteger
         {
            for (var i = smaller.Length; i < bigger.Length; i++)
            {
-               if (isBigger == true)
+               if (isLonger == true)
                {
                    var result = bigger[i] - remainder;
 
@@ -235,11 +257,61 @@ public class BigInteger
 
         while (Convert.ToString(strNumber[0]) == "0")
         {
-            strNumber.Remove(0);
+            strNumber = strNumber.Remove(0, 1);
         }
 
         var resultBigInteger = new BigInteger(strNumber);
         
-        return resultBigInteger;    
+        return resultBigInteger;
+    }
+
+    public BigInteger Add(BigInteger another)
+    {
+        if (isNegative == true && another.isNegative == true)
+        {
+            var result = Sum(_numbers, another.numbers);
+            result.isNegative = true;
+            return result;
+        }
+
+        else if (another.isNegative == true)
+        {
+            return Difference(_numbers, another.numbers);
+        }
+
+        else if (isNegative == true)
+        {
+            return Difference(another.numbers, _numbers);
+        }
+
+        else
+        {
+            return Sum(_numbers, another.numbers);
+        }
+    }
+
+    public BigInteger Sub(BigInteger another)
+    {
+        if (IsNegative == true && another.isNegative == true)
+        {
+            return Difference(another.numbers, _numbers);
+        }
+        
+        else if (another.isNegative == true)
+        {
+            return Sum(_numbers, another.numbers);
+        }
+        
+        else if (isNegative == true)
+        {
+            var result = Sum(_numbers, another.numbers);
+            result.isNegative = true;
+            return result;
+        }
+
+        else
+        {
+            return Difference(_numbers, another.numbers);
+        }
     }
 }

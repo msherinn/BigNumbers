@@ -27,6 +27,7 @@ public class BigInteger
     public int[] numbers => _numbers;
     public static BigInteger operator +(BigInteger a, BigInteger b) => a.Add(b);
     public static BigInteger operator -(BigInteger a, BigInteger b) => a.Sub(b);
+    public static BigInteger operator *(BigInteger a, BigInteger b) => a.Multiply(b);
     
     public bool IsNegative
     {
@@ -58,7 +59,7 @@ public class BigInteger
 
     private BigInteger Sum(int[] a, int[] b)
     {
-        var smaller = a.Length < b.Length ? a : b;
+        var smaller = a.Length <= b.Length ? a : b;
         var bigger = a.Length > b.Length ? a : b;
         var resultNumbers = new int[bigger.Length + 1];
         var remainder = 0;
@@ -67,16 +68,8 @@ public class BigInteger
         for (var i = 0; i < smaller.Length; i++)
         {
             var result = new int();
-            if (remainder == 0)
-            {
-                result = bigger[i] + smaller[i];
-            }
-
-            else
-            {
-                result = bigger[i] + smaller[i] + 1;
-            }
-
+            result = bigger[i] + smaller[i] + remainder;
+            
             if (result >= 10)
             {
                 resultNumbers[i] = result - 10;
@@ -92,19 +85,27 @@ public class BigInteger
 
         if (remainder != 0)
         {
-            for (var i = smaller.Length; i < bigger.Length; i++)
+            if (smaller.Length == bigger.Length)
             {
-                var result = bigger[i] + remainder;
-                if (result >= 10)
+                resultNumbers[^1] = remainder;
+            }
+            else
+            {
+                for (var i = smaller.Length; i < bigger.Length; i++)
                 {
-                    resultNumbers[i] = result - 10;
-                    remainder = 1;
-                }
+                    var result = bigger[i] + remainder;
+                    if (result >= 10)
+                    {
+                        resultNumbers[i] = result - 10;
+                        remainder = 1;
+                    }
 
-                else
-                {
-                    resultNumbers[i] = result;
-                    remainder = 0;
+                    else
+                    {
+                        resultNumbers[i] = result;
+                        remainder = 0;
+                    }
+                    
                 }
             }
         }
@@ -138,7 +139,7 @@ public class BigInteger
 
             for (var i = finalNumbers.Length - 1; i >= 0; i--)
             {
-                strNumber += Convert.ToChar(finalNumbers[i]);
+                strNumber += Convert.ToString(finalNumbers[i]);
             }
         }
 
@@ -157,24 +158,32 @@ public class BigInteger
         var resultNumbers = new int[bigger.Length + 1];
         var remainder = 0;
         var strNumber = "";
-        
+
         if (isEqual == true)
         {
-            var i = a.Length - 1;
-            while (isBigger == true && i >= 0)
+            for (var i = a.Length - 1; i >= 0; i--)
             {
-                isBigger = a[i] >= b[i] ? true : false;
-                i--;
-            }
+                if (a[i] > b[i])
+                {
+                    isBigger = true;
+                    break;
+                }
 
-            if (isBigger == false)
-            {
-                var result = Difference(b, a);
-                result.isNegative = true;
-                return result;
+                else if (b[i] > a[i])
+                {
+                    isBigger = false;
+                    break;
+                }
             }
         }
-        
+
+        if (isBigger == false || isLonger == false)
+        {
+            var result = Difference(b, a);
+            result.isNegative = true;
+            return result;
+        }
+
         for (var i = 0; i < smaller.Length; i++)
         {
             var result = new int();
@@ -313,5 +322,60 @@ public class BigInteger
         {
             return Difference(_numbers, another.numbers);
         }
+    }
+
+    private int[] Karatsuba(int[] a, int[] b)
+    {
+        var m = Math.Min(a.Length, b.Length);
+        var m2 = Convert.ToInt32(Math.Floor(Convert.ToDouble(m / 2)));
+        
+        var low1 = a.Take(m2).ToArray();
+        var high1 = a.Skip(m2).ToArray();
+        var low2 = b.Take(m2).ToArray();
+        var high2 = b.Skip(m2).ToArray();
+
+        var lowhigh1 = Convert.ToString(Convert.ToInt32(String.Join(',', low1)) + Convert.ToInt32(String.Join(',', high1)));
+        var lowhigh2 = Convert.ToString(Convert.ToInt32(String.Join(',', low2)) + Convert.ToInt32(String.Join(',', high2)));
+
+        var _lowhigh1 = new int[lowhigh1.Length];
+        var _lowhigh2 = new int[lowhigh2.Length];
+        
+        for (var i = 0; i < lowhigh1.Length; i++)
+        {
+            _lowhigh1[i] = lowhigh1[i];
+        }
+        
+        for (var i = 0; i < lowhigh2.Length; i++)
+        {
+            _lowhigh2[i] = lowhigh2[i];
+        }
+        
+        var _z0 = Karatsuba(low1, low2);
+        var _z1 = Karatsuba(_lowhigh1, _lowhigh2);
+        var _z2 = Karatsuba(high1, high2);
+
+        var z0 = Convert.ToInt32(String.Join(',', _z0));
+        var z1 = Convert.ToInt32(String.Join(',', _z1));
+        var z2 = Convert.ToInt32(String.Join(',', _z2));
+
+        var result = Convert.ToString(z2 * 10 ^ (m2 * 2)) + ((z1 - z2 - z0) * 10 ^ m2) + z0;
+        var _result = new int[result.Length];
+        
+        for (var i = 0; i < result.Length; i++)
+        {
+            _result[i] = result[i];
+        }
+
+        return _result;
+    }
+
+    public BigInteger Multiply(BigInteger another)
+    {
+        Array.Reverse(_numbers);
+        Array.Reverse(another.numbers);
+        var _result = Karatsuba(_numbers, another.numbers);
+        var result = String.Join(',', _result);
+        var bigInteger = new BigInteger(result);
+        return bigInteger;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using ConsoleApp1;
 
-var x = new BigInteger("111");
+var x = new BigInteger("87562314");
 
-var y = new BigInteger("200");
+var y = new BigInteger("897612349");
 
-Console.WriteLine(x - y);
+Console.WriteLine(x * y);

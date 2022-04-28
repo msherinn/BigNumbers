@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Sandbox\\BigNumers\\ConsoleApp1\\ConsoleApp1.csproj": {}
+    "C:\\Sandbox\\BigNumbers\\ConsoleApp1\\ConsoleApp1.csproj": {}
   },
   "projects": {
-    "C:\\Sandbox\\BigNumers\\ConsoleApp1\\ConsoleApp1.csproj": {
+    "C:\\Sandbox\\BigNumbers\\ConsoleApp1\\ConsoleApp1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Sandbox\\BigNumers\\ConsoleApp1\\ConsoleApp1.csproj",
+        "projectUniqueName": "C:\\Sandbox\\BigNumbers\\ConsoleApp1\\ConsoleApp1.csproj",
         "projectName": "ConsoleApp1",
-        "projectPath": "C:\\Sandbox\\BigNumers\\ConsoleApp1\\ConsoleApp1.csproj",
+        "projectPath": "C:\\Sandbox\\BigNumbers\\ConsoleApp1\\ConsoleApp1.csproj",
         "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
-        "outputPath": "C:\\Sandbox\\BigNumers\\ConsoleApp1\\obj\\",
+        "outputPath": "C:\\Sandbox\\BigNumbers\\ConsoleApp1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\micha\\AppData\\Roaming\\NuGet\\NuGet.Config",

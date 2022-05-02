@@ -9,13 +9,14 @@ public class BigInteger
 
     public BigInteger(string value)
     {
-        _numbers = new int[value.Length];
-
         if (value[0] == '-')
         {
             isNegative = true;
-            value.Remove('-');
+            value = value.Substring(1);
         }
+
+        _numbers = new int[value.Length];
+        
         var j = 0;
         for (var i = value.Length - 1; i >= 0; i--)
         {
@@ -28,6 +29,8 @@ public class BigInteger
     public static BigInteger operator +(BigInteger a, BigInteger b) => a.Add(b);
     public static BigInteger operator -(BigInteger a, BigInteger b) => a.Sub(b);
     public static BigInteger operator *(BigInteger a, BigInteger b) => a.Multiply(b);
+
+    public static BigInteger operator ++(BigInteger a) => a + new BigInteger("1");
     
     public bool IsNegative
     {
@@ -209,6 +212,8 @@ public class BigInteger
                 resultNumbers[i] = result;
                 remainder = 0;
             }
+            
+            //Console.WriteLine("i: " + i + " rem: " + remainder + " result: " + result);
         }
 
         if (remainder != 0)
